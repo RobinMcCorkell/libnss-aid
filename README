@@ -1,0 +1,10 @@
+libnss-aid
+
+Copyright (C) 2013 Robin McCorkell <rmccorkell@karoshi.org.uk>
+
+A basic name service switch module to resolve Android users and groups,
+allowing a chroot system on Android to be able to resolve UIDs and GIDs on
+Android-created files, as well as assigning local users to Android groups for
+permission purposes
+
+Version 0.1

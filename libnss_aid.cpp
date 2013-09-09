@@ -1,4 +1,5 @@
 // libnss_aid.cpp
+// part of libnss-aid
 // 
 // NSS module to return Android users and groups (Android IDs)
 // 
@@ -9,14 +10,15 @@
 #include <pwd.h>
 #include <grp.h>
 
-// C compatibility headers
-#include <cstring>
-
 // C++ headers
 #include <string>
-#include <vector>
-#include <stdexcept>
 #include <memory>
+
+// My headers
+#include "DataEntry.hpp"
+#include "AidLoader.hpp"
+#include "PersistentLooper.hpp"
+#include "AllocateException.hpp"
 
 /* 
 struct passwd
@@ -30,99 +32,6 @@ struct passwd
 	char *pw_shell; // Shell program
 }
  */
-
-// ----------
-// Data entry
-// ----------
-
-struct DataEntry
-{
-	std::string name;
-	unsigned int id;
-};
-
-// ------------
-// Loader class
-// ------------
-class AidLoader
-{
-public:
-	AidLoader(std::string configFilename = "/etc/libnss-aid.conf");
-	const std::vector<DataEntry>& getDb() const;
-	
-private:
-	std::vector<DataEntry> vDb;
-};
-
-// AidLoader functions
-AidLoader::AidLoader(std::string configFilename)
-{
-	//ignore configFilename for now
-	
-	//Generate vDb entries
-	{
-		vDb.push_back( { "aid_system", 1000 } );
-		vDb.push_back( { "aid_radio", 1001 } );
-		vDb.push_back( { "aid_bluetooth", 1002 } );
-	}
-}
-
-const std::vector<DataEntry>& AidLoader::getDb() const
-{
-	return vDb;
-}
-
-// ------------
-// Looper class
-// ------------
-template <class vType>
-class PersistentLooper
-{
-public:
-	enum class Status { OK, END, ERROR };
-
-	PersistentLooper( const std::vector<vType>& loopVector );
-	Status getNext(vType& result);
-	void resetLoop();
-	
-private:
-	const std::vector<vType>& vLoop;
-	typename std::vector<vType>::const_iterator iLoop;
-};
-
-// PersistentLooper functions
-template <class vType>
-PersistentLooper<vType>::PersistentLooper( const std::vector<vType>& loopVector ) : vLoop(loopVector)
-{
-	iLoop = vLoop.begin();
-}
-
-template <class vType>
-typename PersistentLooper<vType>::Status PersistentLooper<vType>::getNext(vType& result)
-{
-	if ( iLoop == vLoop.end() )
-		return Status::END;
-	
-	result = *iLoop;
-	++iLoop;
-	return Status::OK;
-}
-
-template <class vType>
-void PersistentLooper<vType>::resetLoop()
-{
-	iLoop = vLoop.begin();
-}
-
-// ----------------
-// Custom Exception
-// ----------------
-
-class AllocateException : public std::runtime_error
-{
-public:
-	AllocateException(const std::string& msg) : runtime_error(msg) {};
-};
 
 // ----
 // Code

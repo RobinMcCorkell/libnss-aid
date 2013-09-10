@@ -164,7 +164,7 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 }
 
 extern "C" enum nss_status _nss_aid_getpwuid_r(
-	uid_t uid,
+	__uid_t uid,
 	struct passwd *result,
 	char *buffer,
 	size_t buflen,

@@ -25,4 +25,6 @@ private:
 	typename std::vector<vType>::const_iterator iLoop;
 };
 
+#include "PersistentLooper.cpp"
+
 #endif

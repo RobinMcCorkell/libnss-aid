@@ -13,6 +13,7 @@
 // C++ headers
 #include <string>
 #include <memory>
+#include <algorithm>
 
 // My headers
 #include "DataEntry.hpp"
@@ -55,6 +56,20 @@ void strcpyAllocate(const std::string from, char*& to, char*& buffer, size_t& bu
 	
 	from.copy(to, len - 1);
 	to[len - 1] = '\0';
+}
+
+// Fill up a passwd struct with data from a DataEntry
+void fillPasswd(const DataEntry& entry, struct passwd& result, char*& buffer, size_t& buflen)
+{
+	strcpyAllocate(entry.name.c_str(), result.pw_name, buffer, buflen);
+	strcpyAllocate("x", result.pw_passwd, buffer, buflen);
+	
+	result.pw_uid = entry.id;
+	result.pw_gid = entry.id;
+	
+	strcpyAllocate("", result.pw_gecos, buffer, buflen);
+	strcpyAllocate("/", result.pw_dir, buffer, buflen);
+	strcpyAllocate("/bin/false", result.pw_shell, buffer, buflen);
 }
 
 // Extern functions to be exposed to NSS
@@ -109,15 +124,7 @@ extern "C" enum nss_status _nss_aid_getpwent_r(
 	
 	try
 	{
-		strcpyAllocate(tmpEntry.name.c_str(), result->pw_name, buffer, buflen);
-		strcpyAllocate("x", result->pw_passwd, buffer, buflen);
-		
-		result->pw_uid = tmpEntry.id;
-		result->pw_gid = tmpEntry.id;
-		
-		strcpyAllocate("", result->pw_gecos, buffer, buflen);
-		strcpyAllocate("/", result->pw_dir, buffer, buflen);
-		strcpyAllocate("/bin/false", result->pw_shell, buffer, buflen);
+		fillPasswd(tmpEntry, *result, buffer, buflen);
 	}
 	catch (AllocateException& err)
 	{
@@ -137,43 +144,13 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 {
 	std::shared_ptr<AidLoader> myLoader(new AidLoader());
 	
-	if ( dataLooper == nullptr )
-		dataLooper = new PersistentLooper<DataEntry>(myLoader->getDb());
+	auto entryIter = std::find(myLoader->getDb().begin(), myLoader->getDb().end(), std::string(name));
 	
-	DataEntry tmpEntry;
-	typename PersistentLooper<DataEntry>::Status status = PersistentLooper<DataEntry>::Status::OK;
-	bool found = false;
-	
-	while ( status == PersistentLooper<DataEntry>::Status::OK )	
-	{
-		status = dataLooper->getNext(tmpEntry);
-		
-		if ( status == PersistentLooper<DataEntry>::Status::ERROR )
-		{
-			*errnop = EAGAIN;
-			return NSS_STATUS_TRYAGAIN;
-		}
-		
-		if ( tmpEntry.name == name )
-		{
-			found = true;
-			break;
-		}
-	}
-	
-	if (found)
+	if (entryIter != myLoader->getDb().end())
 	{
 		try
 		{
-			strcpyAllocate(tmpEntry.name.c_str(), result->pw_name, buffer, buflen);
-			strcpyAllocate("x", result->pw_passwd, buffer, buflen);
-			
-			result->pw_uid = tmpEntry.id;
-			result->pw_gid = tmpEntry.id;
-			
-			strcpyAllocate("", result->pw_gecos, buffer, buflen);
-			strcpyAllocate("/", result->pw_dir, buffer, buflen);
-			strcpyAllocate("/bin/false", result->pw_shell, buffer, buflen);
+			fillPasswd(*entryIter, *result, buffer, buflen);
 		}
 		catch (AllocateException& err)
 		{

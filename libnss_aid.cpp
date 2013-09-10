@@ -43,7 +43,7 @@ AidLoader* loader;
 PersistentLooper<DataEntry>* dataLooper;
  
 // Allocate some space from the nss static buffer
-void strcpyAllocate(const std::string from, char*& to, char*& buffer, size_t& buflen)
+char* strcpyAllocate(const std::string& from, char*& to, char*& buffer, size_t& buflen)
 {
 	size_t len = from.length() + 1;
 	if ((buffer == nullptr) || (buflen < len)) {
@@ -56,12 +56,14 @@ void strcpyAllocate(const std::string from, char*& to, char*& buffer, size_t& bu
 	
 	from.copy(to, len - 1);
 	to[len - 1] = '\0';
+	
+	return to;
 }
 
 // Fill up a passwd struct with data from a DataEntry
 void fillPasswd(const DataEntry& entry, struct passwd& result, char*& buffer, size_t& buflen)
 {
-	strcpyAllocate(entry.name.c_str(), result.pw_name, buffer, buflen);
+	strcpyAllocate(entry.name, result.pw_name, buffer, buflen);
 	strcpyAllocate("x", result.pw_passwd, buffer, buflen);
 	
 	result.pw_uid = entry.id;
@@ -72,7 +74,11 @@ void fillPasswd(const DataEntry& entry, struct passwd& result, char*& buffer, si
 	strcpyAllocate("/bin/false", result.pw_shell, buffer, buflen);
 }
 
-// Extern functions to be exposed to NSS
+// -------------
+// NSS interface
+// -------------
+
+// NSS passwd functions
 extern "C" enum nss_status _nss_aid_setpwent()
 {
 	loader = new AidLoader();

@@ -9,16 +9,17 @@
 #define HPP_DATAENTRY
 
 #include <string>
+#include <pwd.h>
 
 struct DataEntry
 {
 	std::string name;
-	unsigned int id;
+	uid_t id;
 };
 
 // Overloads
-bool operator==(const DataEntry& a, const unsigned int& b);
-bool operator==(const unsigned int& a, const DataEntry& b);
+bool operator==(const DataEntry& a, const uid_t& b);
+bool operator==(const uid_t& a, const DataEntry& b);
 bool operator==(const DataEntry& a, const std::string& b);
 bool operator==(const std::string& a, const DataEntry& b);
 

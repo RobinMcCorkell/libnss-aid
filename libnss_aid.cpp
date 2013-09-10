@@ -162,3 +162,31 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 	
 	return NSS_STATUS_NOTFOUND;
 }
+
+extern "C" enum nss_status _nss_aid_getpwuid_r(
+	uid_t uid,
+	struct passwd *result,
+	char *buffer,
+	size_t buflen,
+	int *errnop)
+{
+	std::shared_ptr<AidLoader> myLoader(new AidLoader());
+	
+	auto entryIter = std::find(myLoader->getDb().begin(), myLoader->getDb().end(), uid);
+	
+	if (entryIter != myLoader->getDb().end())
+	{
+		try
+		{
+			fillPasswd(*entryIter, *result, buffer, buflen);
+		}
+		catch (AllocateException& err)
+		{
+			*errnop = ERANGE;
+			return NSS_STATUS_TRYAGAIN;
+		}
+		return NSS_STATUS_SUCCESS;
+	}
+	
+	return NSS_STATUS_NOTFOUND;
+}

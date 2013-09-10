@@ -7,11 +7,11 @@
 
 #include "DataEntry.hpp"
 
-bool operator==(const DataEntry& a, const unsigned int& b)
+bool operator==(const DataEntry& a, const uid_t& b)
 {
 	return a.id == b;
 }
-bool operator==(const unsigned int& a, const DataEntry& b)
+bool operator==(const uid_t& a, const DataEntry& b)
 {
 	return a == b.id;
 }

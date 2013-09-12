@@ -72,6 +72,7 @@ char* strcpyAllocate(const std::string& from, char*& to, char*& buffer, size_t& 
 // Allocate some space from the nss static buffer for an array
 char** arrayAllocate(size_t len, char**& to, char*& buffer, size_t& buflen)
 {
+	size_t pos = len;
 	len += 1;
 	len *= sizeof(char*);
 	if ((buffer == nullptr) || (buflen < len)) {
@@ -82,7 +83,7 @@ char** arrayAllocate(size_t len, char**& to, char*& buffer, size_t& buflen)
 	buffer += len;
 	buflen -= len;
 	
-	to[len - 1] = nullptr;
+	to[pos] = nullptr;
 	
 	return to;
 }

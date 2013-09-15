@@ -22,6 +22,9 @@
 #include <pwd.h>
 #include <grp.h>
 
+// C headers
+#include <cstdlib> // for realloc
+
 // C++ headers
 #include <string>
 #include <memory>
@@ -122,8 +125,10 @@ void fillGroup(const DataEntry& entry, struct group& result, char*& buffer, size
 	
 	result.gr_gid = entry.id;
 	
-	char** aMembers = arrayAllocate(1, result.gr_mem, buffer, buflen);
-	strcpyAllocate(entry.name, aMembers[0], buffer, buflen);
+	char** aMembers = arrayAllocate(entry.members.size(), result.gr_mem, buffer, buflen);
+	size_t i = 0;
+	for ( const auto& memberName : entry.members )
+		strcpyAllocate(memberName, aMembers[i++], buffer, buflen);
 }
 
 // -------------
@@ -356,6 +361,69 @@ extern "C" enum nss_status _nss_aid_getgrgid_r(
 		try
 		{
 			fillGroup(*entryIter, *result, buffer, buflen);
+		}
+		catch (AllocateException& err)
+		{
+			*errnop = ERANGE;
+			return NSS_STATUS_TRYAGAIN;
+		}
+		return NSS_STATUS_SUCCESS;
+	}
+	
+	return NSS_STATUS_NOTFOUND;
+}
+
+// Returns a list of groups for a user
+// Documentation is scarce (read: non-existent) so the paramteters are assumed
+//  char *user - user to search for
+//  gid_t skipgroup - group to not include in results
+//  size_t *start - where to write in the array, incremented ???
+//  size_t *buflen - length of buffer in gid_t entries
+//  gid_t **buffer - pointer to array of returned GIDs
+//  size_t limit - maximum size of array
+//  int *errnop - error status
+extern "C" enum nss_status _nss_aid_initgroups_dyn(
+	const char *user,
+	gid_t skipgroup,
+	size_t *start,
+	size_t *buflen,
+	gid_t **buffer,
+	size_t limit,
+	int *errnop)
+{
+	AidLoader myLoader{};
+	
+	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), std::string{user});
+	
+	if (entryIter != myLoader.getDb().end())
+	{
+		try
+		{
+			for (const auto& entry : myLoader.getDb())
+			{
+				if ( std::find(entry.members.begin(), entry.members.end(), std::string{user}) != entry.members.end() )
+				{
+					// Limit check
+					if ( (limit > 0) && (*start >= limit) )
+						break;
+					
+					// Buffer size check
+					if ( (*start) >= (*buflen) )
+					{
+						size_t new_buflen = 2 * (*buflen);
+						if ( (limit > 0) && (new_buflen > limit) )
+							new_buflen = limit;
+						gid_t *new_buffer = (gid_t*) realloc(*buffer, new_buflen * sizeof(gid_t));
+						if (new_buffer == nullptr)
+							throw AllocateException{"Unable to reallocate memory"};
+						*buffer = new_buffer;
+						*buflen = new_buflen;
+					}
+					
+					// Add GID to list
+					(*buffer)[(*start)++] = entry.id;
+				}
+			}
 		}
 		catch (AllocateException& err)
 		{

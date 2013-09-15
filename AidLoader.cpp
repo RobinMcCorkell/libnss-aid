@@ -29,9 +29,9 @@ AidLoader::AidLoader(std::string configFilename)
 	
 	//Generate vDb entries
 	{
-		vDb.push_back( { "aid_system", 1000 } );
-		vDb.push_back( { "aid_radio", 1001 } );
-		vDb.push_back( { "aid_bluetooth", 1002 } );
+		vDb.push_back( { "aid_system", 1000, {"aid_system"} } );
+		vDb.push_back( { "aid_radio", 1001, {"aid_radio"} } );
+		vDb.push_back( { "aid_bluetooth", 1002, {"aid_bluetooth"} } );
 	}
 }
 

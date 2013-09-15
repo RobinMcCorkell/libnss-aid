@@ -22,11 +22,13 @@
 
 #include <string>
 #include <sys/types.h>
+#include <vector>
 
 struct DataEntry
 {
 	std::string name;
 	uid_t id;
+	std::vector<std::string> members;
 };
 
 // Overloads

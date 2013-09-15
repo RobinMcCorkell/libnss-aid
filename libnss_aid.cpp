@@ -68,7 +68,7 @@ char* strcpyAllocate(const std::string& from, char*& to, char*& buffer, size_t& 
 {
 	size_t len = from.length() + 1;
 	if ((buffer == nullptr) || (buflen < len)) {
-		throw AllocateException("Insufficient space in buffer");
+		throw AllocateException{"Insufficient space in buffer"};
 	}
 	
 	to = buffer;
@@ -88,7 +88,7 @@ char** arrayAllocate(size_t len, char**& to, char*& buffer, size_t& buflen)
 	len += 1;
 	len *= sizeof(char*);
 	if ((buffer == nullptr) || (buflen < len)) {
-		throw AllocateException("Insufficient space in buffer");
+		throw AllocateException{"Insufficient space in buffer"};
 	}
 	
 	to = (char**) buffer;
@@ -133,7 +133,7 @@ void fillGroup(const DataEntry& entry, struct group& result, char*& buffer, size
 // NSS passwd functions
 extern "C" enum nss_status _nss_aid_setpwent()
 {
-	loader = new AidLoader();
+	loader = new AidLoader{};
 	return NSS_STATUS_SUCCESS;
 }
 
@@ -163,7 +163,7 @@ extern "C" enum nss_status _nss_aid_getpwent_r(
 	}
 	
 	if ( dataLooper == nullptr )
-		dataLooper = new PersistentLooper<DataEntry>(loader->getDb());
+		dataLooper = new PersistentLooper<DataEntry>{loader->getDb()};
 	
 	DataEntry tmpEntry;
 	typename PersistentLooper<DataEntry>::Status status = dataLooper->getNext(tmpEntry);
@@ -200,11 +200,11 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 	size_t buflen,
 	int *errnop)
 {
-	std::shared_ptr<AidLoader> myLoader(new AidLoader());
+	AidLoader myLoader{};
 	
-	auto entryIter = std::find(myLoader->getDb().begin(), myLoader->getDb().end(), std::string(name));
+	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), std::string{name});
 	
-	if (entryIter != myLoader->getDb().end())
+	if (entryIter != myLoader.getDb().end())
 	{
 		try
 		{
@@ -228,11 +228,11 @@ extern "C" enum nss_status _nss_aid_getpwuid_r(
 	size_t buflen,
 	int *errnop)
 {
-	std::shared_ptr<AidLoader> myLoader(new AidLoader());
+	AidLoader myLoader{};
 	
-	auto entryIter = std::find(myLoader->getDb().begin(), myLoader->getDb().end(), uid);
+	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), uid);
 	
-	if (entryIter != myLoader->getDb().end())
+	if (entryIter != myLoader.getDb().end())
 	{
 		try
 		{
@@ -252,7 +252,7 @@ extern "C" enum nss_status _nss_aid_getpwuid_r(
 // NSS group functions
 extern "C" enum nss_status _nss_aid_setgrent()
 {
-	loader = new AidLoader();
+	loader = new AidLoader{};
 	return NSS_STATUS_SUCCESS;
 }
 
@@ -282,7 +282,7 @@ extern "C" enum nss_status _nss_aid_getgrent_r(
 	}
 	
 	if ( dataLooper == nullptr )
-		dataLooper = new PersistentLooper<DataEntry>(loader->getDb());
+		dataLooper = new PersistentLooper<DataEntry>{loader->getDb()};
 	
 	DataEntry tmpEntry;
 	typename PersistentLooper<DataEntry>::Status status = dataLooper->getNext(tmpEntry);
@@ -319,11 +319,11 @@ extern "C" enum nss_status _nss_aid_getgrnam_r(
 	size_t buflen,
 	int *errnop)
 {
-	std::shared_ptr<AidLoader> myLoader(new AidLoader());
+	AidLoader myLoader{};
 	
-	auto entryIter = std::find(myLoader->getDb().begin(), myLoader->getDb().end(), std::string(name));
+	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), std::string{name});
 	
-	if (entryIter != myLoader->getDb().end())
+	if (entryIter != myLoader.getDb().end())
 	{
 		try
 		{
@@ -347,11 +347,11 @@ extern "C" enum nss_status _nss_aid_getgrgid_r(
 	size_t buflen,
 	int *errnop)
 {
-	std::shared_ptr<AidLoader> myLoader(new AidLoader());
+	AidLoader myLoader{};
 	
-	auto entryIter = std::find(myLoader->getDb().begin(), myLoader->getDb().end(), gid);
+	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), gid);
 	
-	if (entryIter != myLoader->getDb().end())
+	if (entryIter != myLoader.getDb().end())
 	{
 		try
 		{

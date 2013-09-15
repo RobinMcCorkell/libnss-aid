@@ -38,8 +38,8 @@ struct passwd
 {
 	char *pw_name; // Username
 	char *pw_passwd; // Password
-	__uid_t pw_uid; // User ID
-	__git_t pw_gid; // Group ID
+	uid_t pw_uid; // User ID
+	gid_t pw_gid; // Group ID
 	char *pw_gecos; // Real name
 	char *pw_dir; // Home directory
 	char *pw_shell; // Shell program
@@ -49,7 +49,7 @@ struct group
 {
 	char *gr_name; // Group name
 	char *gr_passwd; // Password
-	__gid_t gr_gid; //Group ID
+	gid_t gr_gid; //Group ID
 	char **gr_mem; // Member list
 };
 
@@ -222,7 +222,7 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 }
 
 extern "C" enum nss_status _nss_aid_getpwuid_r(
-	__uid_t uid,
+	uid_t uid,
 	struct passwd *result,
 	char *buffer,
 	size_t buflen,
@@ -341,7 +341,7 @@ extern "C" enum nss_status _nss_aid_getgrnam_r(
 }
 
 extern "C" enum nss_status _nss_aid_getgrgid_r(
-	__gid_t gid,
+	gid_t gid,
 	struct group *result,
 	char *buffer,
 	size_t buflen,

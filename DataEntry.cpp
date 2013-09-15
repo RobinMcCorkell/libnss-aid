@@ -19,11 +19,11 @@
 
 #include "DataEntry.hpp"
 
-bool operator==(const DataEntry& a, const __uid_t& b)
+bool operator==(const DataEntry& a, const uid_t& b)
 {
 	return a.id == b;
 }
-bool operator==(const __uid_t& a, const DataEntry& b)
+bool operator==(const uid_t& a, const DataEntry& b)
 {
 	return a == b.id;
 }

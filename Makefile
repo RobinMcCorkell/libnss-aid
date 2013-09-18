@@ -15,7 +15,7 @@
 # along with libnss-aid.  If not, see <http:#www.gnu.org/licenses/>.
 
 CXXFLAGS=-Wall -fPIC -std=c++11
-LDFLAGS=-shared -Wl,-soname,libnss_aid.so.2
+LDFLAGS=-shared -Wl,-soname,libnss_aid.so.2 -lboost_program_options
 
 all: libnss_aid.so.2
 
@@ -29,5 +29,11 @@ clean:
 	rm -f *.o libnss_aid.so.2
 
 install:
-	cp libnss_aid.so.2 /lib
+	install libnss_aid.so.2 /lib
+	cp -i libnss-aid.conf /etc
 
+uninstall:
+	rm -f /lib/libnss_aid.so.2
+
+purge: uninstall
+	rm -f /etc/libnss-aid.conf

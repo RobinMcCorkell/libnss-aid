@@ -21,6 +21,7 @@
 #define HPP_PERSISTENTLOOPER
 
 #include <vector>
+#include <boost/program_options/variables_map.hpp>
 
 template <class vType>
 class PersistentLooper
@@ -28,13 +29,14 @@ class PersistentLooper
 public:
 	enum class Status { OK, END, ERROR };
 
-	PersistentLooper( const std::vector<vType>& loopVector );
+	PersistentLooper( const std::vector<vType>& loopVector, const boost::program_options::variables_map& config );
 	Status getNext(vType& result);
 	void resetLoop();
 	
 private:
 	const std::vector<vType>& vLoop;
 	typename std::vector<vType>::const_iterator iLoop;
+	const boost::program_options::variables_map& mConfig;
 };
 
 #include "PersistentLooper.cpp"

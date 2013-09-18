@@ -20,7 +20,7 @@
 #include "PersistentLooper.hpp"
 
 template <class vType>
-PersistentLooper<vType>::PersistentLooper( const std::vector<vType>& loopVector ) : vLoop(loopVector)
+PersistentLooper<vType>::PersistentLooper( const std::vector<vType>& loopVector, const boost::program_options::variables_map& config ) : vLoop(loopVector), mConfig(config)
 {
 	iLoop = vLoop.begin();
 }
@@ -28,6 +28,8 @@ PersistentLooper<vType>::PersistentLooper( const std::vector<vType>& loopVector 
 template <class vType>
 typename PersistentLooper<vType>::Status PersistentLooper<vType>::getNext(vType& result)
 {
+	if ( mConfig["enumerate"].as<bool>() == false )
+		return Status::END;
 	if ( iLoop == vLoop.end() )
 		return Status::END;
 	

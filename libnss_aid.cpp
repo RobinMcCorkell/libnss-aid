@@ -168,7 +168,7 @@ extern "C" enum nss_status _nss_aid_getpwent_r(
 	}
 	
 	if ( dataLooper == nullptr )
-		dataLooper = new PersistentLooper<DataEntry>{loader->getDb()};
+		dataLooper = new PersistentLooper<DataEntry>{loader->getDb(), loader->getConfig()};
 	
 	DataEntry tmpEntry;
 	typename PersistentLooper<DataEntry>::Status status = dataLooper->getNext(tmpEntry);
@@ -287,7 +287,7 @@ extern "C" enum nss_status _nss_aid_getgrent_r(
 	}
 	
 	if ( dataLooper == nullptr )
-		dataLooper = new PersistentLooper<DataEntry>{loader->getDb()};
+		dataLooper = new PersistentLooper<DataEntry>{loader->getDb(), loader->getConfig()};
 	
 	DataEntry tmpEntry;
 	typename PersistentLooper<DataEntry>::Status status = dataLooper->getNext(tmpEntry);

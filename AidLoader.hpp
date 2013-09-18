@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/program_options.hpp>
 
 #include "DataEntry.hpp"
 
@@ -29,11 +30,13 @@ class AidLoader
 {
 public:
 	AidLoader();
-	AidLoader(std::string configFilename);
+	AidLoader(const std::string& configFilename);
 	const std::vector<DataEntry>& getDb() const;
+	const boost::program_options::variables_map& getConfig() const;
 
 private:
 	std::vector<DataEntry> vDb;
+	boost::program_options::variables_map mConfig;
 };
 
 #endif

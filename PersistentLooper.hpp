@@ -32,7 +32,7 @@ public:
 	PersistentLooper( const std::vector<vType>& loopVector, const boost::program_options::variables_map& config );
 	Status getNext(vType& result);
 	void resetLoop();
-	
+
 private:
 	const std::vector<vType>& vLoop;
 	typename std::vector<vType>::const_iterator iLoop;

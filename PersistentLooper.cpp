@@ -32,7 +32,7 @@ typename PersistentLooper<vType>::Status PersistentLooper<vType>::getNext(vType&
 		return Status::END;
 	if ( iLoop == vLoop.end() )
 		return Status::END;
-	
+
 	result = *iLoop;
 	++iLoop;
 	return Status::OK;

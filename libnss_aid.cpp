@@ -36,7 +36,7 @@
 #include "PersistentLooper.hpp"
 #include "AllocateException.hpp"
 
-/* 
+/*
 struct passwd
 {
 	char *pw_name; // Username
@@ -65,7 +65,7 @@ struct group
 // State variables
 AidLoader* loader;
 PersistentLooper<DataEntry>* dataLooper;
- 
+
 // Allocate some space from the nss static buffer
 char* strcpyAllocate(const std::string& from, char*& to, char*& buffer, size_t& buflen)
 {
@@ -73,14 +73,14 @@ char* strcpyAllocate(const std::string& from, char*& to, char*& buffer, size_t& 
 	if ((buffer == nullptr) || (buflen < len)) {
 		throw AllocateException{"Insufficient space in buffer"};
 	}
-	
+
 	to = buffer;
 	buffer += len;
 	buflen -= len;
-	
+
 	from.copy(to, len - 1);
 	to[len - 1] = '\0';
-	
+
 	return to;
 }
 
@@ -93,13 +93,13 @@ char** arrayAllocate(size_t len, char**& to, char*& buffer, size_t& buflen)
 	if ((buffer == nullptr) || (buflen < len)) {
 		throw AllocateException{"Insufficient space in buffer"};
 	}
-	
+
 	to = (char**) buffer;
 	buffer += len;
 	buflen -= len;
-	
+
 	to[pos] = nullptr;
-	
+
 	return to;
 }
 
@@ -108,10 +108,10 @@ void fillPasswd(const DataEntry& entry, struct passwd& result, char*& buffer, si
 {
 	strcpyAllocate(entry.name, result.pw_name, buffer, buflen);
 	strcpyAllocate("x", result.pw_passwd, buffer, buflen);
-	
+
 	result.pw_uid = entry.id;
 	result.pw_gid = entry.id;
-	
+
 	strcpyAllocate("", result.pw_gecos, buffer, buflen);
 	strcpyAllocate("/", result.pw_dir, buffer, buflen);
 	strcpyAllocate("/bin/false", result.pw_shell, buffer, buflen);
@@ -122,9 +122,9 @@ void fillGroup(const DataEntry& entry, struct group& result, char*& buffer, size
 {
 	strcpyAllocate(entry.name, result.gr_name, buffer, buflen);
 	strcpyAllocate("x", result.gr_passwd, buffer, buflen);
-	
+
 	result.gr_gid = entry.id;
-	
+
 	char** aMembers = arrayAllocate(entry.members.size(), result.gr_mem, buffer, buflen);
 	size_t i = 0;
 	for ( const auto& memberName : entry.members )
@@ -149,7 +149,7 @@ extern "C" enum nss_status _nss_aid_endpwent()
 		delete dataLooper;
 		dataLooper = nullptr;
 	}
-	
+
 	delete loader;
 	loader = nullptr;
 	return NSS_STATUS_SUCCESS;
@@ -166,13 +166,13 @@ extern "C" enum nss_status _nss_aid_getpwent_r(
 		*errnop = EAGAIN;
 		return NSS_STATUS_TRYAGAIN;
 	}
-	
+
 	if ( dataLooper == nullptr )
 		dataLooper = new PersistentLooper<DataEntry>{loader->getDb(), loader->getConfig()};
-	
+
 	DataEntry tmpEntry;
 	typename PersistentLooper<DataEntry>::Status status = dataLooper->getNext(tmpEntry);
-	
+
 	switch (status)
 	{
 	case PersistentLooper<DataEntry>::Status::OK:
@@ -184,7 +184,7 @@ extern "C" enum nss_status _nss_aid_getpwent_r(
 		*errnop = EAGAIN;
 		return NSS_STATUS_TRYAGAIN;
 	}
-	
+
 	try
 	{
 		fillPasswd(tmpEntry, *result, buffer, buflen);
@@ -194,7 +194,7 @@ extern "C" enum nss_status _nss_aid_getpwent_r(
 		*errnop = ERANGE;
 		return NSS_STATUS_TRYAGAIN;
 	}
-	
+
 	return NSS_STATUS_SUCCESS;
 }
 
@@ -206,9 +206,9 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 	int *errnop)
 {
 	AidLoader myLoader{};
-	
+
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), std::string{name});
-	
+
 	if (entryIter != myLoader.getDb().end())
 	{
 		try
@@ -222,7 +222,7 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 		}
 		return NSS_STATUS_SUCCESS;
 	}
-	
+
 	return NSS_STATUS_NOTFOUND;
 }
 
@@ -234,9 +234,9 @@ extern "C" enum nss_status _nss_aid_getpwuid_r(
 	int *errnop)
 {
 	AidLoader myLoader{};
-	
+
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), uid);
-	
+
 	if (entryIter != myLoader.getDb().end())
 	{
 		try
@@ -250,7 +250,7 @@ extern "C" enum nss_status _nss_aid_getpwuid_r(
 		}
 		return NSS_STATUS_SUCCESS;
 	}
-	
+
 	return NSS_STATUS_NOTFOUND;
 }
 
@@ -268,7 +268,7 @@ extern "C" enum nss_status _nss_aid_endgrent()
 		delete dataLooper;
 		dataLooper = nullptr;
 	}
-	
+
 	delete loader;
 	loader = nullptr;
 	return NSS_STATUS_SUCCESS;
@@ -285,13 +285,13 @@ extern "C" enum nss_status _nss_aid_getgrent_r(
 		*errnop = EAGAIN;
 		return NSS_STATUS_TRYAGAIN;
 	}
-	
+
 	if ( dataLooper == nullptr )
 		dataLooper = new PersistentLooper<DataEntry>{loader->getDb(), loader->getConfig()};
-	
+
 	DataEntry tmpEntry;
 	typename PersistentLooper<DataEntry>::Status status = dataLooper->getNext(tmpEntry);
-	
+
 	switch (status)
 	{
 	case PersistentLooper<DataEntry>::Status::OK:
@@ -303,7 +303,7 @@ extern "C" enum nss_status _nss_aid_getgrent_r(
 		*errnop = EAGAIN;
 		return NSS_STATUS_TRYAGAIN;
 	}
-	
+
 	try
 	{
 		fillGroup(tmpEntry, *result, buffer, buflen);
@@ -313,7 +313,7 @@ extern "C" enum nss_status _nss_aid_getgrent_r(
 		*errnop = ERANGE;
 		return NSS_STATUS_TRYAGAIN;
 	}
-	
+
 	return NSS_STATUS_SUCCESS;
 }
 
@@ -325,9 +325,9 @@ extern "C" enum nss_status _nss_aid_getgrnam_r(
 	int *errnop)
 {
 	AidLoader myLoader{};
-	
+
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), std::string{name});
-	
+
 	if (entryIter != myLoader.getDb().end())
 	{
 		try
@@ -341,7 +341,7 @@ extern "C" enum nss_status _nss_aid_getgrnam_r(
 		}
 		return NSS_STATUS_SUCCESS;
 	}
-	
+
 	return NSS_STATUS_NOTFOUND;
 }
 
@@ -353,9 +353,9 @@ extern "C" enum nss_status _nss_aid_getgrgid_r(
 	int *errnop)
 {
 	AidLoader myLoader{};
-	
+
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), gid);
-	
+
 	if (entryIter != myLoader.getDb().end())
 	{
 		try
@@ -369,7 +369,7 @@ extern "C" enum nss_status _nss_aid_getgrgid_r(
 		}
 		return NSS_STATUS_SUCCESS;
 	}
-	
+
 	return NSS_STATUS_NOTFOUND;
 }
 
@@ -392,21 +392,25 @@ extern "C" enum nss_status _nss_aid_initgroups_dyn(
 	int *errnop)
 {
 	AidLoader myLoader{};
-	
+
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), std::string{user});
-	
+
 	if (entryIter != myLoader.getDb().end())
 	{
 		try
 		{
 			for (const auto& entry : myLoader.getDb())
 			{
+				// skipgroup check
+				if ( entry.id == skipgroup )
+					continue;
+
 				if ( std::find(entry.members.begin(), entry.members.end(), std::string{user}) != entry.members.end() )
 				{
 					// Limit check
 					if ( (limit > 0) && (*start >= limit) )
 						break;
-					
+
 					// Buffer size check
 					if ( (*start) >= (*buflen) )
 					{
@@ -419,7 +423,7 @@ extern "C" enum nss_status _nss_aid_initgroups_dyn(
 						*buffer = new_buffer;
 						*buflen = new_buflen;
 					}
-					
+
 					// Add GID to list
 					(*buffer)[(*start)++] = entry.id;
 				}
@@ -432,6 +436,6 @@ extern "C" enum nss_status _nss_aid_initgroups_dyn(
 		}
 		return NSS_STATUS_SUCCESS;
 	}
-	
+
 	return NSS_STATUS_NOTFOUND;
 }

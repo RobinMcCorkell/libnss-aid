@@ -29,17 +29,17 @@ AidLoader::AidLoader(const std::string& configFilename)
 {
 	//Process configuration file
 	std::ifstream configFile(configFilename);
-	
+
 	boost::program_options::options_description config;
 	config.add_options()
 		("enumerate", boost::program_options::value<bool>()->default_value(false))
 		("dynamic", boost::program_options::value<bool>()->default_value(true))
 		("group-file", boost::program_options::value<std::string>()->default_value("/etc/libnss-aid.group"));
-	
+
 	boost::program_options::store(
 		boost::program_options::parse_config_file(configFile, config),
 		mConfig);
-	
+
 	//Generate vDb entries
 	{
 		vDb.push_back( { "aid_system", 1000, {"aid_system"} } );
@@ -60,21 +60,21 @@ AidLoader::AidLoader(const std::string& configFilename)
 		vDb.push_back( { "aid_sdcard_rw", 1015, {"aid_sdcard_rw"} } );
 		vDb.push_back( { "aid_vpn", 1016, {"aid_vpn"} } );
 		vDb.push_back( { "aid_keystore", 1017, {"aid_keystore"} } );
-		
+
 		vDb.push_back( { "aid_shell", 2000, {"aid_shell"} } );
 		vDb.push_back( { "aid_cache", 2001, {"aid_cache"} } );
 		vDb.push_back( { "aid_diag", 2002, {"aid_diag"} } );
-		
+
 		vDb.push_back( { "aid_net_bt_admin", 3001, {"aid_net_bt_admin"} } );
 		vDb.push_back( { "aid_net_bt", 3002, {"aid_net_bt"} } );
 		vDb.push_back( { "aid_inet", 3003, {"aid_inet"} } );
 		vDb.push_back( { "aid_net_raw", 3004, {"aid_net_raw"} } );
 		vDb.push_back( { "aid_net_admin", 3005, {"aid_net_admin"} } );
-		
+
 		vDb.push_back( { "aid_misc", 9998, {"aid_misc"} } );
 		vDb.push_back( { "aid_nobody", 9999, {"aid_nobody"} } );
 	}
-	
+
 	//Parse group file and append group entries as necessary
 }
 

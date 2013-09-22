@@ -131,6 +131,22 @@ void fillGroup(const DataEntry& entry, struct group& result, char*& buffer, size
 		strcpyAllocate(memberName, aMembers[i++], buffer, buflen);
 }
 
+// Dynamic mapping
+bool getDynamicAid(const uid_t& id, DataEntry& result, const boost::program_options::variables_map& config)
+{
+	if ( config["dynamic"].as<bool>() )
+	{
+		if ( id >= 10000 && id <= config["dynamic-end"].as<uid_t>() )
+		{
+			result.name = "aid_app" + std::to_string(id - 10000);
+			result.id = id;
+			result.members.push_back("aid_app" + std::to_string(id - 10000));
+			return true;
+		}
+	}
+	return false;
+}
+
 // -------------
 // NSS interface
 // -------------
@@ -223,6 +239,30 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 		return NSS_STATUS_SUCCESS;
 	}
 
+	std::string strName{name};
+	if (strName.length() > 7 && strName.substr(0,7) == "aid_app")
+	{
+		std::string suffix = strName.substr(7);
+		if (std::all_of(suffix.begin(), suffix.end(), ::isdigit))
+		{
+			uid_t uid = std::stoi(suffix) + 10000;
+			DataEntry tmpEntry;
+			if (getDynamicAid(uid, tmpEntry, myLoader.getConfig()));
+			{
+				try
+				{
+					fillPasswd(tmpEntry, *result, buffer, buflen);
+				}
+				catch (AllocateException& err)
+				{
+					*errnop = ERANGE;
+					return NSS_STATUS_TRYAGAIN;
+				}
+				return NSS_STATUS_SUCCESS;
+			}
+		}
+	}
+
 	return NSS_STATUS_NOTFOUND;
 }
 
@@ -242,6 +282,21 @@ extern "C" enum nss_status _nss_aid_getpwuid_r(
 		try
 		{
 			fillPasswd(*entryIter, *result, buffer, buflen);
+		}
+		catch (AllocateException& err)
+		{
+			*errnop = ERANGE;
+			return NSS_STATUS_TRYAGAIN;
+		}
+		return NSS_STATUS_SUCCESS;
+	}
+
+	DataEntry tmpEntry;
+	if (getDynamicAid(uid, tmpEntry, myLoader.getConfig()));
+	{
+		try
+		{
+			fillPasswd(tmpEntry, *result, buffer, buflen);
 		}
 		catch (AllocateException& err)
 		{
@@ -342,6 +397,30 @@ extern "C" enum nss_status _nss_aid_getgrnam_r(
 		return NSS_STATUS_SUCCESS;
 	}
 
+	std::string strName{name};
+	if (strName.length() > 7 && strName.substr(0,7) == "aid_app")
+	{
+		std::string suffix = strName.substr(7);
+		if (std::all_of(suffix.begin(), suffix.end(), ::isdigit))
+		{
+			gid_t gid = std::stoi(suffix) + 10000;
+			DataEntry tmpEntry;
+			if (getDynamicAid(gid, tmpEntry, myLoader.getConfig()));
+			{
+				try
+				{
+					fillGroup(tmpEntry, *result, buffer, buflen);
+				}
+				catch (AllocateException& err)
+				{
+					*errnop = ERANGE;
+					return NSS_STATUS_TRYAGAIN;
+				}
+				return NSS_STATUS_SUCCESS;
+			}
+		}
+	}
+
 	return NSS_STATUS_NOTFOUND;
 }
 
@@ -361,6 +440,21 @@ extern "C" enum nss_status _nss_aid_getgrgid_r(
 		try
 		{
 			fillGroup(*entryIter, *result, buffer, buflen);
+		}
+		catch (AllocateException& err)
+		{
+			*errnop = ERANGE;
+			return NSS_STATUS_TRYAGAIN;
+		}
+		return NSS_STATUS_SUCCESS;
+	}
+
+	DataEntry tmpEntry;
+	if (getDynamicAid(gid, tmpEntry, myLoader.getConfig()));
+	{
+		try
+		{
+			fillGroup(tmpEntry, *result, buffer, buflen);
 		}
 		catch (AllocateException& err)
 		{

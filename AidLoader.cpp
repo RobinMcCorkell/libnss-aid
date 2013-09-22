@@ -34,7 +34,7 @@ AidLoader::AidLoader(const std::string& configFilename)
 	config.add_options()
 		("enumerate", boost::program_options::value<bool>()->default_value(false))
 		("dynamic", boost::program_options::value<bool>()->default_value(true))
-		("group-file", boost::program_options::value<std::string>()->default_value("/etc/libnss-aid.group"));
+		("dynamic-end", boost::program_options::value<uid_t>()->default_value(100000));
 
 	boost::program_options::store(
 		boost::program_options::parse_config_file(configFile, config),

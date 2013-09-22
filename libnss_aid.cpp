@@ -136,7 +136,7 @@ bool getDynamicAid(const uid_t& id, DataEntry& result, const boost::program_opti
 {
 	if ( config["dynamic"].as<bool>() )
 	{
-		if ( id >= 10000 && id <= config["dynamic-end"].as<uid_t>() )
+		if ( id >= 10000 && id < config["dynamic-end"].as<uid_t>() )
 		{
 			result.name = "aid_app" + std::to_string(id - 10000);
 			result.id = id;
@@ -245,9 +245,9 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 		std::string suffix = strName.substr(7);
 		if (std::all_of(suffix.begin(), suffix.end(), ::isdigit))
 		{
-			uid_t uid = std::stoi(suffix) + 10000;
+			uid_t iSuffix = std::stoi(suffix);
 			DataEntry tmpEntry;
-			if (getDynamicAid(uid, tmpEntry, myLoader.getConfig()));
+			if (std::to_string(iSuffix) == suffix && getDynamicAid(iSuffix + 10000, tmpEntry, myLoader.getConfig()))
 			{
 				try
 				{
@@ -292,7 +292,7 @@ extern "C" enum nss_status _nss_aid_getpwuid_r(
 	}
 
 	DataEntry tmpEntry;
-	if (getDynamicAid(uid, tmpEntry, myLoader.getConfig()));
+	if (getDynamicAid(uid, tmpEntry, myLoader.getConfig()))
 	{
 		try
 		{
@@ -403,9 +403,9 @@ extern "C" enum nss_status _nss_aid_getgrnam_r(
 		std::string suffix = strName.substr(7);
 		if (std::all_of(suffix.begin(), suffix.end(), ::isdigit))
 		{
-			gid_t gid = std::stoi(suffix) + 10000;
+			gid_t iSuffix = std::stoi(suffix);
 			DataEntry tmpEntry;
-			if (getDynamicAid(gid, tmpEntry, myLoader.getConfig()));
+			if (std::to_string(iSuffix) == suffix && getDynamicAid(iSuffix + 10000, tmpEntry, myLoader.getConfig()))
 			{
 				try
 				{
@@ -450,7 +450,7 @@ extern "C" enum nss_status _nss_aid_getgrgid_r(
 	}
 
 	DataEntry tmpEntry;
-	if (getDynamicAid(gid, tmpEntry, myLoader.getConfig()));
+	if (getDynamicAid(gid, tmpEntry, myLoader.getConfig()))
 	{
 		try
 		{

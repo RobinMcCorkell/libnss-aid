@@ -225,42 +225,38 @@ extern "C" enum nss_status _nss_aid_getpwnam_r(
 
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), std::string{name});
 
-	if (entryIter != myLoader.getDb().end())
+	try
 	{
-		try
+		if (entryIter != myLoader.getDb().end())
 		{
 			fillPasswd(*entryIter, *result, buffer, buflen);
+			return NSS_STATUS_SUCCESS;
 		}
-		catch (AllocateException& err)
-		{
-			*errnop = ERANGE;
-			return NSS_STATUS_TRYAGAIN;
-		}
-		return NSS_STATUS_SUCCESS;
-	}
 
-	std::string strName{name};
-	if (strName.length() > 7 && strName.substr(0,7) == "aid_app")
-	{
-		std::string suffix = strName.substr(7);
-		if (std::all_of(suffix.begin(), suffix.end(), ::isdigit))
+		std::string strName{name};
+		if (strName.length() > 7 && strName.substr(0,7) == "aid_app")
 		{
-			uid_t iSuffix = std::stoi(suffix);
-			DataEntry tmpEntry;
-			if (std::to_string(iSuffix) == suffix && getDynamicAid(iSuffix + 10000, tmpEntry, myLoader.getConfig()))
+			std::string suffix = strName.substr(7);
+			if (std::all_of(suffix.begin(), suffix.end(), ::isdigit))
 			{
-				try
+				uid_t iSuffix = std::stoi(suffix);
+				DataEntry tmpEntry;
+				if (std::to_string(iSuffix) == suffix && getDynamicAid(iSuffix + 10000, tmpEntry, myLoader.getConfig()))
 				{
 					fillPasswd(tmpEntry, *result, buffer, buflen);
+					return NSS_STATUS_SUCCESS;
 				}
-				catch (AllocateException& err)
-				{
-					*errnop = ERANGE;
-					return NSS_STATUS_TRYAGAIN;
-				}
-				return NSS_STATUS_SUCCESS;
 			}
 		}
+	}
+	catch (AllocateException& err)
+	{
+		*errnop = ERANGE;
+		return NSS_STATUS_TRYAGAIN;
+	}
+	catch (std::out_of_range& err)
+	{
+		return NSS_STATUS_NOTFOUND;
 	}
 
 	return NSS_STATUS_NOTFOUND;
@@ -277,33 +273,25 @@ extern "C" enum nss_status _nss_aid_getpwuid_r(
 
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), uid);
 
-	if (entryIter != myLoader.getDb().end())
+	try
 	{
-		try
+		if (entryIter != myLoader.getDb().end())
 		{
 			fillPasswd(*entryIter, *result, buffer, buflen);
+			return NSS_STATUS_SUCCESS;
 		}
-		catch (AllocateException& err)
-		{
-			*errnop = ERANGE;
-			return NSS_STATUS_TRYAGAIN;
-		}
-		return NSS_STATUS_SUCCESS;
-	}
 
-	DataEntry tmpEntry;
-	if (getDynamicAid(uid, tmpEntry, myLoader.getConfig()))
-	{
-		try
+		DataEntry tmpEntry;
+		if (getDynamicAid(uid, tmpEntry, myLoader.getConfig()))
 		{
 			fillPasswd(tmpEntry, *result, buffer, buflen);
+			return NSS_STATUS_SUCCESS;
 		}
-		catch (AllocateException& err)
-		{
-			*errnop = ERANGE;
-			return NSS_STATUS_TRYAGAIN;
-		}
-		return NSS_STATUS_SUCCESS;
+	}
+	catch (AllocateException& err)
+	{
+		*errnop = ERANGE;
+		return NSS_STATUS_TRYAGAIN;
 	}
 
 	return NSS_STATUS_NOTFOUND;
@@ -383,42 +371,38 @@ extern "C" enum nss_status _nss_aid_getgrnam_r(
 
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), std::string{name});
 
-	if (entryIter != myLoader.getDb().end())
+	try
 	{
-		try
+		if (entryIter != myLoader.getDb().end())
 		{
 			fillGroup(*entryIter, *result, buffer, buflen);
+			return NSS_STATUS_SUCCESS;
 		}
-		catch (AllocateException& err)
+		
+		std::string strName{name};
+		if (strName.length() > 7 && strName.substr(0,7) == "aid_app")
 		{
-			*errnop = ERANGE;
-			return NSS_STATUS_TRYAGAIN;
-		}
-		return NSS_STATUS_SUCCESS;
-	}
-
-	std::string strName{name};
-	if (strName.length() > 7 && strName.substr(0,7) == "aid_app")
-	{
-		std::string suffix = strName.substr(7);
-		if (std::all_of(suffix.begin(), suffix.end(), ::isdigit))
-		{
-			gid_t iSuffix = std::stoi(suffix);
-			DataEntry tmpEntry;
-			if (std::to_string(iSuffix) == suffix && getDynamicAid(iSuffix + 10000, tmpEntry, myLoader.getConfig()))
+			std::string suffix = strName.substr(7);
+			if (std::all_of(suffix.begin(), suffix.end(), ::isdigit))
 			{
-				try
+				gid_t iSuffix = std::stoi(suffix);
+				DataEntry tmpEntry;
+				if (std::to_string(iSuffix) == suffix && getDynamicAid(iSuffix + 10000, tmpEntry, myLoader.getConfig()))
 				{
 					fillGroup(tmpEntry, *result, buffer, buflen);
+					return NSS_STATUS_SUCCESS;
 				}
-				catch (AllocateException& err)
-				{
-					*errnop = ERANGE;
-					return NSS_STATUS_TRYAGAIN;
-				}
-				return NSS_STATUS_SUCCESS;
 			}
 		}
+	}
+	catch (AllocateException& err)
+	{
+		*errnop = ERANGE;
+		return NSS_STATUS_TRYAGAIN;
+	}
+	catch (std::out_of_range& err)
+	{
+		return NSS_STATUS_NOTFOUND;
 	}
 
 	return NSS_STATUS_NOTFOUND;
@@ -435,33 +419,25 @@ extern "C" enum nss_status _nss_aid_getgrgid_r(
 
 	auto entryIter = std::find(myLoader.getDb().begin(), myLoader.getDb().end(), gid);
 
-	if (entryIter != myLoader.getDb().end())
+	try
 	{
-		try
+		if (entryIter != myLoader.getDb().end())
 		{
 			fillGroup(*entryIter, *result, buffer, buflen);
+			return NSS_STATUS_SUCCESS;
 		}
-		catch (AllocateException& err)
-		{
-			*errnop = ERANGE;
-			return NSS_STATUS_TRYAGAIN;
-		}
-		return NSS_STATUS_SUCCESS;
-	}
 
-	DataEntry tmpEntry;
-	if (getDynamicAid(gid, tmpEntry, myLoader.getConfig()))
-	{
-		try
+		DataEntry tmpEntry;
+		if (getDynamicAid(gid, tmpEntry, myLoader.getConfig()))
 		{
 			fillGroup(tmpEntry, *result, buffer, buflen);
+			return NSS_STATUS_SUCCESS;
 		}
-		catch (AllocateException& err)
-		{
-			*errnop = ERANGE;
-			return NSS_STATUS_TRYAGAIN;
-		}
-		return NSS_STATUS_SUCCESS;
+	}
+	catch (AllocateException& err)
+	{
+		*errnop = ERANGE;
+		return NSS_STATUS_TRYAGAIN;
 	}
 
 	return NSS_STATUS_NOTFOUND;

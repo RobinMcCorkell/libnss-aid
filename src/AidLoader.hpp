@@ -30,7 +30,6 @@ class AidLoader
 {
 public:
 	AidLoader();
-	AidLoader(const std::string& configFilename);
 	const std::vector<DataEntry>& getDb() const;
 	const boost::program_options::variables_map& getConfig() const;
 

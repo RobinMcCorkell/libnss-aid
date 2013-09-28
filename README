@@ -1,5 +1,5 @@
 libnss-aid
-Version 0.3
+Version 1.0
 
  Copyright (C) 2013 Robin McCorkell
  This file is part of libnss-aid.
@@ -25,7 +25,8 @@ permission purposes
 Contact:
  Robin McCorkell <rmccorkell@karoshi.org.uk>
 
-Installation:
- Run 'make' to compile and link the program
- Run 'make install' as root to install the program
- Configure /etc/nsswitch.conf to use 'aid' for both passwd and group lookups
+See INSTALL for instructions on how to install this program. For preparing a
+release, run ./autogen.sh to generate the required files.
+
+All source files are contained in the src directory. Additional macros used in
+configure.ac are stored in the m4 directory.

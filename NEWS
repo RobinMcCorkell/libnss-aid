@@ -1,0 +1,30 @@
+changes from 0.3 to 1.0
+-----------------------
+
+* use autotools
+* move source to subdirectory
+* GNUify project with files like NEWS (this one), ChangeLog, AUTHORS and
+  INSTALL
+* add compile-time option to change path to configuration file
+
+changes from 0.2 to 0.3
+-----------------------
+
+* whitespace cleanup in code
+* fully implement skipgroups for initgroups_dyn
+* implement the dynamic resolver
+* add support for a configuration file
+* resolve full range of static AIDs
+
+changes from 0.1 to 0.2
+-----------------------
+
+* use LGPLv3 for all files
+* implement initgroups_dyn to resolve groups for a given user
+
+initial release 0.1
+-------------------
+
+* implement setpwent, endpwent, getpwent, getpwnam, getpwuid for passwd
+  database
+* implement setgrend, endgrent, getgrent, getgrnam, getgrgid for group database

@@ -17,18 +17,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with libnss-aid.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "config.h"
 #include "AidLoader.hpp"
 
 #include <fstream>
 
-AidLoader::AidLoader() : AidLoader("/etc/libnss-aid.conf")
-{
-}
-
-AidLoader::AidLoader(const std::string& configFilename)
+AidLoader::AidLoader()
 {
 	//Process configuration file
-	std::ifstream configFile(configFilename);
+	std::ifstream configFile(CONF_PATH);
 
 	boost::program_options::options_description config;
 	config.add_options()

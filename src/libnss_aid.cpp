@@ -378,7 +378,7 @@ extern "C" enum nss_status _nss_aid_getgrnam_r(
 			fillGroup(*entryIter, *result, buffer, buflen);
 			return NSS_STATUS_SUCCESS;
 		}
-		
+
 		std::string strName{name};
 		if (strName.length() > 7 && strName.substr(0,7) == "aid_app")
 		{

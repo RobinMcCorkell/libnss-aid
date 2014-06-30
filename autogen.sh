@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create ChangeLog from git
-if [[ -d .git ]] && which git > /dev/null; then
+if which git > /dev/null && git rev-parse; then
 	[[ -e ChangeLog ]] && rm -f ChangeLog
 	git log --pretty=medium --abbrev-commit > ChangeLog
 else
